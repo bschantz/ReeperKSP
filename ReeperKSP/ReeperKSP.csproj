@@ -1,0 +1,164 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{13E7B9E2-7789-497F-9F94-5F4C72B2B32A}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>ReeperKSP</RootNamespace>
+    <AssemblyName>ReeperKSP</AssemblyName>
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile>Unity Subset v3.5</TargetFrameworkProfile>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Assembly-CSharp">
+      <HintPath>..\..\..\Kerbal Space Program\KSP_Data\Managed\Assembly-CSharp.dll</HintPath>
+    </Reference>
+    <Reference Include="KSPUtil">
+      <HintPath>..\..\..\Kerbal Space Program\KSP_Data\Managed\KSPUtil.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+    <Reference Include="UnityEngine">
+      <HintPath>..\..\..\Kerbal Space Program\KSP_Data\Managed\UnityEngine.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="AssetBundleLoading\AssetBundleAssetAttribute.cs" />
+    <Compile Include="AssetBundleLoading\AssetBundleAssetLoader.cs" />
+    <Compile Include="AssetBundleLoading\AssetBundleHandle.cs" />
+    <Compile Include="AssetBundleLoading\AssetBundleNotFoundException.cs" />
+    <Compile Include="AssetBundleLoading\AssetNotFoundException.cs" />
+    <Compile Include="AssetBundleLoading\AsyncAssetBundleLoadException.cs" />
+    <Compile Include="AssetBundleLoading\FailedToLoadAssetException.cs" />
+    <Compile Include="AssetBundleLoading\IAssetBundleAssetsInjectedCallbackReceiver.cs" />
+    <Compile Include="AssetBundleLoading\LoadedAssemblyNotFoundException.cs" />
+    <Compile Include="Extensions\AssemblyExtensions.cs" />
+    <Compile Include="Extensions\CameraExtensions.cs" />
+    <Compile Include="Extensions\ConfigNodeExtensions.cs" />
+    <Compile Include="Extensions\Texture2DExtensions.cs" />
+    <Compile Include="FileSystem\DirectoryNotFoundException.cs" />
+    <Compile Include="FileSystem\FilenameMustContainExtensionException.cs" />
+    <Compile Include="FileSystem\IDirectory.cs" />
+    <Compile Include="FileSystem\IFile.cs" />
+    <Compile Include="FileSystem\IFileSystemFactory.cs" />
+    <Compile Include="FileSystem\ITemporaryFileFactory.cs" />
+    <Compile Include="FileSystem\IUrlDir.cs" />
+    <Compile Include="FileSystem\IUrlDirProvider.cs" />
+    <Compile Include="FileSystem\IUrlFile.cs" />
+    <Compile Include="FileSystem\IUrlIdentifier.cs" />
+    <Compile Include="FileSystem\KSPDirectory.cs" />
+    <Compile Include="FileSystem\KSPFile.cs" />
+    <Compile Include="FileSystem\KSPFileSystemFactory.cs" />
+    <Compile Include="FileSystem\KSPUrlDir.cs" />
+    <Compile Include="FileSystem\KSPUrlFile.cs" />
+    <Compile Include="FileSystem\KSPUrlIdentifier.cs" />
+    <Compile Include="FileSystem\Providers\KSPGameDataUrlDirProvider.cs" />
+    <Compile Include="FileSystem\TemporaryFile.cs" />
+    <Compile Include="FileSystem\TemporaryFileFactory.cs" />
+    <Compile Include="FileSystem\UrlType.cs" />
+    <Compile Include="Gui\Controls\ColorPickerBox.cs" />
+    <Compile Include="Gui\Controls\ColorPickerControl.cs" />
+    <Compile Include="Gui\Controls\ColorSaturationSlider.cs" />
+    <Compile Include="Gui\UniqueWindowIdProvider.cs" />
+    <Compile Include="Gui\WindowId.cs" />
+    <Compile Include="Gui\Window\BasicWindowLogic.cs" />
+    <Compile Include="Gui\Window\Buttons\BasicTitleBarButton.cs" />
+    <Compile Include="Gui\Window\Buttons\ITitleBarButton.cs" />
+    <Compile Include="Gui\Window\Decorators\AdjustableScale.cs" />
+    <Compile Include="Gui\Window\Decorators\ClampToScreen.cs" />
+    <Compile Include="Gui\Window\Decorators\HideOnF2.cs" />
+    <Compile Include="Gui\Window\Decorators\Resizable.cs" />
+    <Compile Include="Gui\Window\Decorators\TitleBarButtons.cs" />
+    <Compile Include="Gui\Window\Decorators\WindowDecorator.cs" />
+    <Compile Include="Gui\Window\Decorators\WindowScale.cs" />
+    <Compile Include="Gui\Window\IWindowComponent.cs" />
+    <Compile Include="Gui\Window\View\WindowView.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Providers\AssemblyLocationProvider.cs" />
+    <Compile Include="Providers\IAssemblyLocationProvider.cs" />
+    <Compile Include="Repositories\ResourceFromDirectory.cs" />
+    <Compile Include="Repositories\ResourceFromGameDatabase.cs" />
+    <Compile Include="Serialization\CompositeSerializerSelector.cs" />
+    <Compile Include="Serialization\CompositeSurrogateProvider.cs" />
+    <Compile Include="Serialization\ConfigNodeSerializer.cs" />
+    <Compile Include="Serialization\DefaultConfigNodeSerializer.cs" />
+    <Compile Include="Serialization\Exceptions\AmbiguousKeyException.cs" />
+    <Compile Include="Serialization\Exceptions\ConfigNodeDuplicateKeyException.cs" />
+    <Compile Include="Serialization\Exceptions\DuplicateSurrogateException.cs" />
+    <Compile Include="Serialization\Exceptions\NoConversionException.cs" />
+    <Compile Include="Serialization\Exceptions\NoDefaultValueException.cs" />
+    <Compile Include="Serialization\Exceptions\NoSerializerFoundException.cs" />
+    <Compile Include="Serialization\Exceptions\ReeperSerializationException.cs" />
+    <Compile Include="Serialization\Exceptions\WrongNativeSerializerException.cs" />
+    <Compile Include="Serialization\Exceptions\WrongSerializerException.cs" />
+    <Compile Include="Serialization\FieldSerializer.cs" />
+    <Compile Include="Serialization\GenericSurrogateProvider.cs" />
+    <Compile Include="Serialization\GetSerializableFields.cs" />
+    <Compile Include="Serialization\GetSerializationSurrogates.cs" />
+    <Compile Include="Serialization\GetSurrogateSupportedTypes.cs" />
+    <Compile Include="Serialization\IConfigNodeItemSerializer.cs" />
+    <Compile Include="Serialization\IConfigNodeSerializer.cs" />
+    <Compile Include="Serialization\IGetObjectFields.cs" />
+    <Compile Include="Serialization\IGetSerializationSurrogates.cs" />
+    <Compile Include="Serialization\IGetSurrogateSupportedTypes.cs" />
+    <Compile Include="Serialization\IReeperPersistent.cs" />
+    <Compile Include="Serialization\ISerializerSelector.cs" />
+    <Compile Include="Serialization\ISurrogateProvider.cs" />
+    <Compile Include="Serialization\NativeSerializer.cs" />
+    <Compile Include="Serialization\PersistenceMethodCaller.cs" />
+    <Compile Include="Serialization\PreferNativeSerializer.cs" />
+    <Compile Include="Serialization\ReeperPersistentAttribute.cs" />
+    <Compile Include="Serialization\SerializerSelector.cs" />
+    <Compile Include="Serialization\SerializerSelectorDecorator.cs" />
+    <Compile Include="Serialization\SurrogateProvider.cs" />
+    <Compile Include="Serialization\Surrogates\ColorSurrogate.cs" />
+    <Compile Include="Serialization\Surrogates\ConfigNodeSurrogate.cs" />
+    <Compile Include="Serialization\Surrogates\ListSurrogate.cs" />
+    <Compile Include="Serialization\Surrogates\PrimitiveSurrogateSerializer.cs" />
+    <Compile Include="Serialization\Surrogates\QuaternionSurrogate.cs" />
+    <Compile Include="Serialization\Surrogates\RectSurrogate.cs" />
+    <Compile Include="Serialization\Surrogates\SingleValueSurrogate.cs" />
+    <Compile Include="Serialization\Surrogates\Vector2Surrogate.cs" />
+    <Compile Include="Serialization\Surrogates\Vector3Surrogate.cs" />
+    <Compile Include="Serialization\Surrogates\WindowComponentSurrogateAdapter.cs" />
+    <Compile Include="Serialization\Surrogates\WindowIDSurrogate.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\ReeperCommon\ReeperCommon\ReeperCommon.csproj">
+      <Project>{fecfa8fc-cf80-4685-a2ba-1566e0f3c26e}</Project>
+      <Name>ReeperCommon</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

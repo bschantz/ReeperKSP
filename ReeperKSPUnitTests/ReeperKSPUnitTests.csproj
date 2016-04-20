@@ -1,0 +1,170 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{8CF94850-23FC-4737-A4B9-1FA609CD3C08}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>ReeperKSPUnitTests</RootNamespace>
+    <AssemblyName>ReeperKSPUnitTests</AssemblyName>
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\..\ReeperCommon\</SolutionDir>
+    <RestorePackages>true</RestorePackages>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Assembly-CSharp">
+      <HintPath>..\..\..\Kerbal Space Program\KSP_Data\Managed\Assembly-CSharp.dll</HintPath>
+    </Reference>
+    <Reference Include="KSPUtil">
+      <HintPath>..\..\..\Kerbal Space Program\KSP_Data\Managed\KSPUtil.dll</HintPath>
+    </Reference>
+    <Reference Include="NSubstitute, Version=1.8.2.0, Culture=neutral, PublicKeyToken=92dd2e9066daa5ca, processorArchitecture=MSIL">
+      <HintPath>..\..\ReeperCommon\packages\NSubstitute.1.8.2.0\lib\net35\NSubstitute.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Ploeh.AutoFixture, Version=2.16.2.0, Culture=neutral, PublicKeyToken=b24654c590009d4f, processorArchitecture=MSIL">
+      <HintPath>..\..\ReeperCommon\packages\AutoFixture.2.16.2\lib\net35\Ploeh.AutoFixture.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Ploeh.AutoFixture.AutoNSubstitute, Version=2.16.2.0, Culture=neutral, PublicKeyToken=b24654c590009d4f, processorArchitecture=MSIL">
+      <HintPath>..\..\ReeperCommon\packages\AutoFixture.AutoNSubstitute.2.16.2\lib\net35\Ploeh.AutoFixture.AutoNSubstitute.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Ploeh.AutoFixture.Xunit, Version=2.16.2.0, Culture=neutral, PublicKeyToken=b24654c590009d4f, processorArchitecture=MSIL">
+      <HintPath>..\..\ReeperCommon\packages\AutoFixture.Xunit.2.16.2\lib\net35\Ploeh.AutoFixture.Xunit.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Ploeh.SemanticComparison, Version=2.16.2.0, Culture=neutral, PublicKeyToken=b24654c590009d4f, processorArchitecture=MSIL">
+      <HintPath>..\..\ReeperCommon\packages\AutoFixture.2.16.2\lib\net35\Ploeh.SemanticComparison.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+    <Reference Include="UnityEngine">
+      <HintPath>..\..\..\Kerbal Space Program\KSP_Data\Managed\UnityEngine.dll</HintPath>
+    </Reference>
+    <Reference Include="xunit, Version=1.9.2.1705, Culture=neutral, PublicKeyToken=8d05b1bb7a6fdb6c, processorArchitecture=MSIL">
+      <HintPath>..\..\ReeperCommon\packages\xunit.1.9.2\lib\net20\xunit.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="xunit.extensions, Version=1.9.2.1705, Culture=neutral, PublicKeyToken=8d05b1bb7a6fdb6c, processorArchitecture=MSIL">
+      <HintPath>..\..\ReeperCommon\packages\xunit.extensions.1.9.2\lib\net20\xunit.extensions.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="XunitShould, Version=4.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\ReeperCommon\packages\XunitShould.4.0.0\lib\net35\XunitShould.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Extensions\ConfigNodeExtensionsTests.cs" />
+    <Compile Include="FileSystem\Framework\IFakeDirectory.cs" />
+    <Compile Include="FileSystem\Framework\IFakeDirectoryBuilder.cs" />
+    <Compile Include="FileSystem\Framework\IFakeDirectoryFactory.cs" />
+    <Compile Include="FileSystem\Framework\Implementations\FakeDirectory.cs" />
+    <Compile Include="FileSystem\Framework\Implementations\FakeDirectoryBuilder.cs" />
+    <Compile Include="FileSystem\Framework\Implementations\FakeDirectoryFactory.cs" />
+    <Compile Include="FileSystem\Framework\Implementations\UrlFileMocker.cs" />
+    <Compile Include="FileSystem\Framework\IUrlFileMocker.cs" />
+    <Compile Include="FileSystem\Framework\Tests\FakeDirectoryBuilder_Test.cs" />
+    <Compile Include="FileSystem\Framework\Tests\FakeDirectory_Test.cs" />
+    <Compile Include="FileSystem\Framework\Tests\UrlFileMocker_Test.cs" />
+    <Compile Include="FileSystem\KSPDirectory_Test.cs" />
+    <Compile Include="FileSystem\KSPFileSystemFactoryTests.cs" />
+    <Compile Include="FileSystem\KSPFile_Test.cs" />
+    <Compile Include="FileSystem\KSPUrlIdentifier_Test.cs" />
+    <Compile Include="Fixtures\AutoDomainDataAttribute.cs" />
+    <Compile Include="Fixtures\DomainCustomization.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Serialization\Complex\NativeSerializableObjectWithNativeSerializableField.cs" />
+    <Compile Include="Serialization\Complex\SerializeObjectWithComplexFieldsAndNative.cs" />
+    <Compile Include="Serialization\Complex\SerializeObjectWithFieldsNoSurrogateOrNativeTests.cs" />
+    <Compile Include="Serialization\Complex\SerializeObjectWithFieldsWithNativeTests.cs" />
+    <Compile Include="Serialization\CompositeSurrogateProviderTests.cs" />
+    <Compile Include="Serialization\ConfigNodeSerializerTests.cs" />
+    <Compile Include="Serialization\FieldSerializerTests.cs" />
+    <Compile Include="Serialization\GenericSurrogateProviderTests.cs" />
+    <Compile Include="Serialization\GetSerializableFieldsTests.cs" />
+    <Compile Include="Serialization\GetSerializationSurrogatesTests.cs" />
+    <Compile Include="Serialization\GetSurrogateSupportedTypesTests.cs" />
+    <Compile Include="Serialization\NativeSerializerTests.cs" />
+    <Compile Include="Serialization\PersistenceMethodCallerTests.cs" />
+    <Compile Include="Serialization\PreferNativeSerializerTests.cs" />
+    <Compile Include="Serialization\ReeperPersistentMethodCallerTests.cs" />
+    <Compile Include="Serialization\SerializableFieldQueryTests.cs" />
+    <Compile Include="Serialization\SerializerSelectorTests.cs" />
+    <Compile Include="Serialization\SurrogateProviderTests.cs" />
+    <Compile Include="Serialization\Surrogates\ColorSurrogateTests.cs" />
+    <Compile Include="Serialization\Surrogates\ConfigNodeComparer.cs" />
+    <Compile Include="Serialization\Surrogates\ConfigNodeSurrogateTests.cs" />
+    <Compile Include="Serialization\Surrogates\ListSurrogateTests.cs" />
+    <Compile Include="Serialization\Surrogates\PrimitiveSurrogateTests.cs" />
+    <Compile Include="Serialization\Surrogates\QuaternionSurrogateTests.cs" />
+    <Compile Include="Serialization\Surrogates\RectSurrogateTests.cs" />
+    <Compile Include="Serialization\Surrogates\Vector2SurrogateTests.cs" />
+    <Compile Include="Serialization\Surrogates\Vector3SurrogateTests.cs" />
+    <Compile Include="Serialization\ValueTypeSerializationTests.cs" />
+    <Compile Include="TestData\ComplexPersistentObject.cs" />
+    <Compile Include="TestData\DefaultConstructableType.cs" />
+    <Compile Include="TestData\NativeSerializableType.cs" />
+    <Compile Include="TestData\SimplePersistentObject.cs" />
+    <Compile Include="TestData\SimplePersistentObjectNative.cs" />
+    <Compile Include="TestData\StrangeViewStandin.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Serialization\Live\" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="app.config" />
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\ReeperCommon\ReeperCommon\ReeperCommon.csproj">
+      <Project>{fecfa8fc-cf80-4685-a2ba-1566e0f3c26e}</Project>
+      <Name>ReeperCommon</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\ReeperKSP\ReeperKSP.csproj">
+      <Project>{13e7b9e2-7789-497f-9f94-5f4c72b2b32a}</Project>
+      <Name>ReeperKSP</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <Import Project="$(SolutionDir)\.nuget\NuGet.targets" Condition="Exists('$(SolutionDir)\.nuget\NuGet.targets')" />
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Enable NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('$(SolutionDir)\.nuget\NuGet.targets')" Text="$([System.String]::Format('$(ErrorText)', '$(SolutionDir)\.nuget\NuGet.targets'))" />
+  </Target>
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
