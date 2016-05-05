@@ -6,8 +6,9 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using JetBrains.Annotations;
-using ReeperCommon.AssetBundleLoading;
+using KSPAssets.Loaders;
 using ReeperCommon.Containers;
+using ReeperCommon.Extensions;
 using ReeperCommon.Logging;
 using ReeperCommon.Utilities;
 using ReeperKSP.FileSystem;
@@ -22,6 +23,7 @@ namespace ReeperKSP.AssetBundleLoading
         static readonly Dictionary<string, AssetBundle> InternalLoadedBundles =
             new Dictionary<string, AssetBundle>();
 
+        private static readonly List<string> PendingBundles = new List<string>(); 
 
         // ReSharper disable once MemberCanBePrivate.Global
         public static ReadOnlyCollection<KeyValuePair<string, AssetBundleHandle>> LoadedBundles
@@ -49,6 +51,10 @@ namespace ReeperKSP.AssetBundleLoading
         }
 
 
+        /// <summary>
+        /// Synchronously inject assets into the target type's static fields
+        /// </summary>
+        /// <param name="type"></param>
         public static void InjectAssets([NotNull] Type type)
         {
             if (type == null) throw new ArgumentNullException("type");
@@ -87,68 +93,141 @@ namespace ReeperKSP.AssetBundleLoading
         }
 
 
-        public static void InjectAssetsAsync(object target)
+        /// <summary>
+        /// Injects fields of the target. If the target is null, only static fields will be injected.
+        /// </summary>
+        /// <param name="target"></param>
+        /// <param name="targetType"></param>
+        /// <returns></returns>
+        public static Coroutine<ValuelessCoroutine> InjectAssetsAsync(
+            [CanBeNull] object target,
+            [NotNull] Type targetType)
+        {
+            if (targetType == null) throw new ArgumentNullException("targetType");
+
+            return CoroutineHoster.Instance.StartCoroutineValueless(InjectAssetsAsync_Internal(target, targetType));
+        }
+
+
+        /// <summary>
+        ///  Injects static fields asynchronously
+        /// </summary>
+        /// <param name="targetType"></param>
+        /// <returns></returns>
+        public static Coroutine<ValuelessCoroutine> InjectAssetsAsync([NotNull] Type targetType)
+        {
+            if (targetType == null) throw new ArgumentNullException("targetType");
+
+            return InjectAssetsAsync(null, targetType);
+        }
+
+
+        /// <summary>
+        /// Injects all fields of the target instance asynchronously
+        /// </summary>
+        /// <param name="target"></param>
+        /// <returns></returns>
+        public static Coroutine<ValuelessCoroutine> InjectAssetsAsync([NotNull] object target)
         {
             if (target == null) throw new ArgumentNullException("target");
 
-            ReeperCommon.Utilities.CoroutineHoster.Instance.StartCoroutine(InjectAssetsAsyncHosted(target, target.GetType()));
+            return InjectAssetsAsync(target, target.GetType());
         }
 
 
-        public static IEnumerator InjectAssetsAsyncHosted([NotNull] object target)
-        {
-            if (target == null) throw new ArgumentNullException("target");
-
-            return InjectAssetsAsyncHosted(target, target.GetType());
-        }
-
-
-        public static void InjectAssetsAsync([NotNull] Type targetType)
+        private static List<string> GetPathsOfNecessaryBundles([NotNull] Type targetType, [NotNull] IEnumerable<FieldInfo> fieldsToInject)
         {
             if (targetType == null) throw new ArgumentNullException("targetType");
+            if (fieldsToInject == null) throw new ArgumentNullException("fieldsToInject");
 
-            CoroutineHoster.Instance.StartCoroutine(InjectAssetsAsyncHosted(null, targetType));
+            return fieldsToInject
+                .Select(fi => GetAssetBundleFullPath(targetType, GetAttribute(fi).Value))
+                    .OrderByDescending(f => f)
+                    .Distinct()
+                    .ToList();
         }
 
 
-        public static IEnumerator InjectAssetsAsyncHosted([NotNull] Type targetType)
+        private static bool IsBundlePending(string bundlePath)
         {
-            if (targetType == null) throw new ArgumentNullException("targetType");
-
-            return InjectAssetsAsyncHosted(null, targetType);
+            return PendingBundles.Contains(bundlePath);
         }
 
 
-        private static void InjectAssetsAsync([CanBeNull] object target, [NotNull] Type targetType)
+        private static IEnumerator WaitForBundle(string bundlePath, float timeoutSeconds = 60f)
         {
-            if (targetType == null) throw new ArgumentNullException("targetType");
+            Log.Verbose("Waiting for pending bundle: " + bundlePath);
 
-            CoroutineHoster.Instance.StartCoroutine(InjectAssetsAsyncHosted(target, targetType));
+            var timeoutTime = Time.realtimeSinceStartup + timeoutSeconds;
+
+            // ReSharper disable once LoopVariableIsNeverChangedInsideLoop
+            while (IsBundlePending(bundlePath) && (Time.realtimeSinceStartup < timeoutTime))
+                yield return null;
+
+            if (Time.realtimeSinceStartup > timeoutTime)
+                throw new AssetBundleNotFoundException("Pending AssetBundle " + bundlePath + " timed out");
+
+            if (!InternalLoadedBundles.Keys.Contains(bundlePath))
+                throw new AssetBundleNotFoundException("Pending AssetBundle " + bundlePath +
+                                                       " was not loaded correctly.");
         }
 
 
+        // Note to future: if this isn't run as a Coroutine<ValuelessCoroutine> exceptions will be silenced! That's why I've made it 
+        // private and forced the user to do the right thing using the exposed methods
+        //
         // ReSharper disable once UnusedMember.Global
         // ReSharper disable once MemberCanBePrivate.Global
-        private static IEnumerator InjectAssetsAsyncHosted([CanBeNull] object target, [NotNull] Type targetType)
+        private static IEnumerator InjectAssetsAsync_Internal(
+            [CanBeNull] object target, 
+            [NotNull] Type targetType)
         {
             if (targetType == null) throw new ArgumentNullException("targetType");
+
+            Log.Debug("Injecting assets async into " + targetType.Name);
 
             SendPreInjectionCallback(target);
 
             var targetFields = GetFieldsOf(target, targetType).Where(fi => GetAttribute(fi).Any()).ToList();
+            var pathsOfBundles = GetPathsOfNecessaryBundles(targetType, targetFields);
 
-            var pathsOfBundles =
-                targetFields
-                .Select(fi => GetAssetBundleFullPath(targetType, GetAttribute(fi).Value))
-                    .OrderByDescending(f => f)
-                    .Distinct();
+            foreach (var path in pathsOfBundles)
+                Log.Debug("Bundle dependency: " + path);
 
             // make sure all of the needed AssetBundles are loaded
             foreach (var bundlePath in pathsOfBundles)
             {
-                if (!GetLoadedAssetBundle(bundlePath).Any())
-                    yield return CoroutineHoster.Instance.StartCoroutine(LoadAssetBundleAsync(bundlePath));
+                if (GetLoadedAssetBundle(bundlePath).Any()) continue; // already have this bundle ready
+
+                var bundleLoader = CoroutineHoster.Instance.StartCoroutine<Exception>(IsBundlePending(bundlePath) 
+                    ? WaitForBundle(bundlePath) : 
+                    LoadAssetBundleAsync(bundlePath));
+
+                yield return bundleLoader.YieldUntilComplete;
+
+                if (!bundleLoader.Error.Any()) continue; // no errors, carry on
+
+                // ReSharper disable once ThrowingSystemException
+                throw bundleLoader.Error.Value;
             }
+
+            var fieldAssetLoader =
+                CoroutineHoster.Instance.StartCoroutine<Dictionary<FieldInfo, Object>>(LoadFieldAssets(targetType, targetFields));
+
+            yield return fieldAssetLoader.YieldUntilComplete;
+
+            var fieldValues = fieldAssetLoader.Value;
+
+            AssignFields(target, fieldValues);
+            SendPostInjectionCallback(target);
+        }
+
+
+        // Coroutine<Dictionary<FieldInfo, Object>>
+        private static IEnumerator LoadFieldAssets([NotNull] Type targetType, [NotNull] List<FieldInfo> targetFields)
+        {
+            if (targetType == null) throw new ArgumentNullException("targetType");
+            if (targetFields == null) throw new ArgumentNullException("targetFields");
 
             var fieldValues = new Dictionary<FieldInfo, Object>();
 
@@ -164,39 +243,60 @@ namespace ReeperKSP.AssetBundleLoading
                                                         field.Name + ":" + field.FieldType + " on " +
                                                         field.DeclaringType + ", " + attr);
 
-                yield return CoroutineHoster.Instance                    .StartCoroutine(LoadFieldValueAsync(bundle.Value, field, attr, fieldValues));
+                var fieldValueLoader = CoroutineHoster.Instance.StartCoroutine<Exception>(LoadFieldValueAsync(bundle.Value, field, attr, fieldValues));
+
+                yield return fieldValueLoader.YieldUntilComplete;
+
+                if (fieldValueLoader.Error.Any())
+                    // ReSharper disable once ThrowingSystemException
+                    throw fieldValueLoader.Error.Value;
             }
 
-            AssignFields(target, fieldValues);
-            SendPostInjectionCallback(target);
+            yield return fieldValues;
         }
-
-
 
 
         private static IEnumerator LoadAssetBundleAsync(string assetBundlePath)
         {
-            if (string.IsNullOrEmpty(assetBundlePath))
-                throw new ArgumentException("cannot be null or empty", "assetBundlePath");
+            if (string.IsNullOrEmpty(assetBundlePath)) throw new ArgumentException("cannot be null or empty", "assetBundlePath");
 
             if (!File.Exists(assetBundlePath)) throw new FileNotFoundException("File not found!", assetBundlePath);
+
 
             if (InternalLoadedBundles.Keys.Any(k => k == assetBundlePath))
                 throw new ArgumentException("AssetBundle '" + assetBundlePath + "' has already been loaded");
 
+            if (PendingBundles.Contains(assetBundlePath))
+                throw new ArgumentException("AssetBundle '" + assetBundlePath +
+                                            "' is pending. Wait for it instead of attempting to load another (which will fail)");
+
             var wwwLoad = new WWW(Uri.EscapeUriString(Application.platform == RuntimePlatform.WindowsPlayer ? "file:///" + assetBundlePath : "file://" + assetBundlePath));
 
+            PendingBundles.Add(assetBundlePath);
+
             yield return wwwLoad;
+
+            PendingBundles.Remove(assetBundlePath);
 
             if (!string.IsNullOrEmpty(wwwLoad.error))
                 throw new AsyncAssetBundleLoadException(wwwLoad.error);
 
-            var bundle = wwwLoad.assetBundle;
+            try
+            {
+                var bundle = wwwLoad.assetBundle;
 
-            if (bundle == null)
-                throw new ArgumentException("Failed to create AssetBundle from '" + assetBundlePath + "'");
+                if (bundle == null)
+                    throw new ArgumentException("Failed to create AssetBundle from '" + assetBundlePath + "'");
 
-            InternalLoadedBundles.Add(assetBundlePath, bundle);
+                Log.Warning("Bundle loaded successfully: " + assetBundlePath);
+                InternalLoadedBundles.Add(assetBundlePath, bundle);
+            }
+            catch (Exception e)
+            {
+                Log.Error("Caught exception: " + e + " in LoadAssetBundleAsync");
+            }
+
+            yield return true;
         }
 
 
@@ -223,12 +323,12 @@ namespace ReeperKSP.AssetBundleLoading
         /// <param name="assetType"></param>
         /// <param name="asset"></param>
         /// <returns></returns>
-        static Object LoadAssetImmediate(AssetBundle bundle, Type assetType, AssetBundleAssetAttribute asset)
+        private static Object LoadAssetImmediate(AssetBundle bundle, Type assetType, AssetBundleAssetAttribute asset)
         {
-            if (!bundle.GetAllAssetNames().Any(assetName => string.Equals(assetName, asset.Name)))
+            if (!bundle.GetAllAssetNames().Any(assetName => string.Equals(assetName, asset.AssetPathInBundle)))
                 throw new AssetNotFoundException(asset);
 
-            var loadedAsset = bundle.LoadAsset(asset.Name, GetAssetTypeToLoad(assetType));
+            var loadedAsset = bundle.LoadAsset(asset.AssetPathInBundle, GetAssetTypeToLoad(assetType));
 
             if (loadedAsset == null)
                 throw new FailedToLoadAssetException(asset, assetType);
@@ -238,16 +338,18 @@ namespace ReeperKSP.AssetBundleLoading
 
 
 
-        static IEnumerator LoadFieldValueAsync(
+        private static IEnumerator LoadFieldValueAsync(
             AssetBundle bundle,
             FieldInfo field,
             AssetBundleAssetAttribute asset,
             Dictionary<FieldInfo, Object> fieldValues)
         {
-            if (!bundle.GetAllAssetNames().Any(assetName => string.Equals(assetName, asset.Name)))
+            if (!bundle.GetAllAssetNames().Any(assetName => string.Equals(assetName, asset.AssetPathInBundle)))
                 throw new AssetNotFoundException(asset);
 
-            var assetRequest = bundle.LoadAssetAsync(asset.Name, GetAssetTypeToLoad(field.FieldType));
+            // todo: make sure this handles multiple simultaneous requests of the same asset correctly by not failing
+            // if the asset is already loaded by the time it returns
+            var assetRequest = bundle.LoadAssetAsync(asset.AssetPathInBundle, GetAssetTypeToLoad(field.FieldType));
 
             yield return assetRequest;
 
@@ -256,8 +358,11 @@ namespace ReeperKSP.AssetBundleLoading
             if (loadedAsset == null)
                 throw new FailedToLoadAssetException(asset, field.FieldType);
 
-            fieldValues.Add(field, ApplyCreationOptions(ConvertLoadedAssetToCorrectType(loadedAsset, field.FieldType, asset), field.FieldType, asset));
+            fieldValues.Add(field,
+                ApplyCreationOptions(ConvertLoadedAssetToCorrectType(loadedAsset, field.FieldType, asset),
+                    field.FieldType, asset));
         }
+
 
         /// <summary>
         /// If the asset was loaded as a GameObject and the field type is some kind of component, we must grab the actual component
@@ -335,6 +440,9 @@ namespace ReeperKSP.AssetBundleLoading
             if (InternalLoadedBundles.Keys.Any(k => k == assetBundlePath))
                 throw new ArgumentException("AssetBundle '" + assetBundlePath + "' has already been loaded");
 
+            if (PendingBundles.Contains(assetBundlePath)) // todo: cancel pending asset bundle, if necessary? just throw for now
+                throw new ArgumentException("Bundle '" + assetBundlePath + "' is already being loaded asynchronously", "assetBundlePath");
+            
             var bundle = AssetBundle.CreateFromMemoryImmediate(File.ReadAllBytes(assetBundlePath));
 
             if (bundle == null)

@@ -1,5 +1,4 @@
 using System;
-using ReeperCommon.AssetBundleLoading;
 
 namespace ReeperKSP.AssetBundleLoading
 {
@@ -12,6 +11,11 @@ namespace ReeperKSP.AssetBundleLoading
 
         public AssetBundleNotFoundException(AssetBundleHandle handle)
             : base("No AssetBundle that matches " + handle + " found")
+        {
+            
+        }
+
+        public AssetBundleNotFoundException(string message) : base(message)
         {
             
         }

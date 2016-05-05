@@ -6,7 +6,9 @@ namespace ReeperKSP.AssetBundleLoading
     // ReSharper disable once ClassNeverInstantiated.Global
     public sealed class AssetBundleAssetAttribute : Attribute
     {
-        public string Name { get; private set; }
+        public string AssetPathInBundle { get; private set; }
+
+        // This a URL relative to the assembly containing the to-be-injected type
         public string AssetBundleRelativeUrl { get; private set; }
         public AssetCreationStyle CreationStyle { get; private set; }
 
@@ -16,9 +18,9 @@ namespace ReeperKSP.AssetBundleLoading
             Instance // actually create an instance, a convenience that would allow the consumer to begin using the asset immediately
         }
 
-        public AssetBundleAssetAttribute(string name, string assetBundleRelativeUrl, AssetCreationStyle creationStyle = AssetCreationStyle.Prefab)
+        public AssetBundleAssetAttribute(string assetPathInBundle, string assetBundleRelativeUrl, AssetCreationStyle creationStyle = AssetCreationStyle.Prefab)
         {
-            Name = name;
+            AssetPathInBundle = assetPathInBundle;
             AssetBundleRelativeUrl = assetBundleRelativeUrl;
             CreationStyle = creationStyle;
         }
@@ -26,7 +28,7 @@ namespace ReeperKSP.AssetBundleLoading
 
         public override string ToString()
         {
-            return string.Format("AssetBundleAsset: Name: {0}, Bundle: {1}, creationStyle: {2}", Name, AssetBundleRelativeUrl, CreationStyle);
+            return string.Format("AssetBundleAsset: AssetPathInBundle: {0}, Bundle: {1}, creationStyle: {2}", AssetPathInBundle, AssetBundleRelativeUrl, CreationStyle);
         }
     }
 }

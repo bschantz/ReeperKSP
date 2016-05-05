@@ -1,13 +1,9 @@
 ﻿using System;
 using JetBrains.Annotations;
-using ReeperKSP.AssetBundleLoading;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
-// ReSharper disable InconsistentNaming
-// ReSharper disable UnusedMember.Global
-
-namespace ReeperCommon.AssetBundleLoading
+namespace ReeperKSP.AssetBundleLoading
 {
     /// <summary>
     /// If we just return the raw AssetBundle, the user might do something stupid with it (like Unload it) without us knowing
