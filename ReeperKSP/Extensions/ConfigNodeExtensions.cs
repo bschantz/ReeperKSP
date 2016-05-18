@@ -71,7 +71,7 @@ namespace ReeperKSP.Extensions
         /// <param name="node"></param>
         /// <param name="valueName"></param>
         /// <param name="value"></param>
-        public static void Set<T>(this global::ConfigNode node, string valueName, T value)
+        public static void Set<T>(this ConfigNode node, string valueName, T value)
         {
             if (node.HasValue(valueName))
                 node.SetValue(valueName, value.ToString());

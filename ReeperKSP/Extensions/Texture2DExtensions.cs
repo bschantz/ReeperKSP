@@ -1,9 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using ReeperCommon.Logging;
 using UnityEngine;
 using ReeperCommonTexture2DExtensions = ReeperCommon.Extensions.Texture2DExtensions;
 
@@ -47,8 +44,8 @@ namespace ReeperKSP.Extensions
                 if (!Directory.Exists(directory))
                     Directory.CreateDirectory(directory);
 
-                var file = new System.IO.FileStream(fullPath, System.IO.FileMode.OpenOrCreate, System.IO.FileAccess.Write);
-                var writer = new System.IO.BinaryWriter(file);
+                var file = new FileStream(fullPath, FileMode.OpenOrCreate, FileAccess.Write);
+                var writer = new BinaryWriter(file);
                 writer.Write(texture.EncodeToPNG());
 
                 return true;

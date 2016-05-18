@@ -9,5 +9,9 @@ namespace ReeperKSP.AssetBundleLoading
         {
 
         }
+
+        public FailedToLoadAssetException(string message) : base(message)
+        {
+        }
     }
 }

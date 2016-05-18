@@ -8,6 +8,7 @@ using Xunit;
 
 namespace ReeperKSPUnitTests.FileSystem
 {
+    // ReSharper disable once InconsistentNaming
     public class KSPDirectory_Test
     {
         public static class Factory
@@ -237,14 +238,48 @@ namespace ReeperKSPUnitTests.FileSystem
                 Factory.CreateBuilder()
                     .WithFile("firstfile.txt")
                     .WithFile("secondfile.bmp")
-                    .WithDirectory("directory")
+                    .MakeDirectory("directory")
                         .MakeDirectory("subdir")
                         .WithFile("subfile.txt")
                         .Build();
 
             Assert.Equal(new[] {"firstfile.txt", "secondfile.bmp"}, sut.Files().Select(f => f.FileName));
+
+            Assert.NotEmpty(sut.Files("bmp"));
+            Assert.NotEmpty(sut.Files(".bmp"));
+            Assert.NotEmpty(sut.Files("*.bmp"));
+            Assert.NotEmpty(sut.Files("*.*"));
+            Assert.NotEmpty(sut.Files(".*"));
+            Assert.NotEmpty(sut.Files("*"));
+
             Assert.Equal(new[] {"secondfile.bmp"}, sut.Files("bmp").Select(f => f.FileName));
             Assert.Equal(new[] { "secondfile.bmp" }, sut.Files(".bmp").Select(f => f.FileName));
+            Assert.Equal(new[] { "secondfile.bmp" }, sut.Files("*.bmp").Select(f => f.FileName));
+
+            Assert.Equal(new[] {"firstfile.txt", "secondfile.bmp"}, sut.Files("*.*").Select(f => f.FileName));
+            Assert.Equal(new[] {"firstfile.txt", "secondfile.bmp"}, sut.Files(".*").Select(f => f.FileName));
+            Assert.Equal(new[] {"firstfile.txt", "secondfile.bmp"}, sut.Files("*").Select(f => f.FileName));
+
+
+            Assert.Empty(sut.Files("directory/*.bmp"));
+            Assert.Empty(sut.Files("directory/*.txt"));
+            Assert.Empty(sut.Files("directory/*.*"));
+
+            Assert.NotEmpty(sut.Files("directory/subdir/*.*").ToList());
+            Assert.NotEmpty(sut.Files("directory/subdir/.*").ToList());
+            Assert.NotEmpty(sut.Files("directory/subdir/*").ToList());
+            Assert.NotEmpty(sut.Files("directory\\subdir\\*.*").ToList());
+            Assert.NotEmpty(sut.Files("directory\\subdir\\.*").ToList());
+            Assert.NotEmpty(sut.Files("directory\\subdir\\*").ToList());
+            Assert.NotEmpty(sut.Files("directory/subdir\\*.*").ToList());
+            Assert.NotEmpty(sut.Files("directory\\subdir/*.*").ToList());
+
+            Assert.Empty(sut.Files("directory/subdir"));
+            Assert.NotEmpty(sut.Files("directory/subdir/*.txt"));
+            Assert.Equal(new[] { "subfile.txt" }, sut.Files("directory/subdir/*.txt").Select(f => f.FileName));
+            Assert.NotEmpty(sut.Files("directory/subdir/*.*"));
+            Assert.Equal(new[] {"subfile.txt"}, sut.Files("directory/subdir/*.*").Select(f => f.FileName));
+
         }
 
 

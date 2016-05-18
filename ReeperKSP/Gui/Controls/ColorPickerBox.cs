@@ -42,7 +42,7 @@ namespace ReeperKSP.Gui.Controls
             w = Mathf.Max(1, w);
             h = Mathf.Max(1, h);
 
-            if (_texture != null) UnityEngine.Object.Destroy(_texture);
+            if (_texture != null) Object.Destroy(_texture);
 
             _texture = new Texture2D(w, h, TextureFormat.ARGB32, false);
 

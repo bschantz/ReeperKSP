@@ -48,7 +48,7 @@ namespace ReeperKSP.Repositories
             // worked just fine but the docs say they should be escaped and this
             // works so I think it's the best solution currently
             //WWW clipData = new WWW(WWW.EscapeURL(path));
-            var data = new WWW(System.Uri.EscapeUriString(path));
+            var data = new WWW(Uri.EscapeUriString(path));
 
             float start = Time.realtimeSinceStartup;
 
@@ -66,7 +66,7 @@ namespace ReeperKSP.Repositories
         {
             var file = _directory.File(new KSPUrlIdentifier(identifier));
 
-            return file.IsNull() ? Maybe<byte[]>.None : Maybe<byte[]>.With(System.IO.File.ReadAllBytes(file.Single().FullPath));
+            return file.IsNull() ? Maybe<byte[]>.None : Maybe<byte[]>.With(File.ReadAllBytes(file.Single().FullPath));
         }
 
 
@@ -120,8 +120,8 @@ namespace ReeperKSP.Repositories
 
         public override string ToString()
         {
-            return string.Format("ResourceFromDirectory: '{0}'", _directory.Url) + System.Environment.NewLine +
-                   string.Join(System.Environment.NewLine,
+            return string.Format("ResourceFromDirectory: '{0}'", _directory.Url) + Environment.NewLine +
+                   string.Join(Environment.NewLine,
                        _directory.Directories().Select(d => "Directory: " + d.Url).Union(
                            _directory.Files().Select(f => "File: " + f.Url + "/" + f.FileName)).ToArray());
         }

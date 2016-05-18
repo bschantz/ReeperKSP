@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using JetBrains.Annotations;
 using ReeperCommon.Containers;
 using ReeperCommon.Extensions;
 
@@ -11,8 +13,6 @@ namespace ReeperKSP.FileSystem
     {
         public readonly IFileSystemFactory FileSystemFactory;
         public readonly IUrlDir RootDirectory;
-
-
 
 
         public KSPDirectory(
@@ -106,40 +106,51 @@ namespace ReeperKSP.FileSystem
         }
 
 
-        //public void AddFileToHierarchy(IUrlFile file)
-        //{
-        //    if (file == null) throw new ArgumentNullException("file");
-
-        //    throw new NotImplementedException();
-        //    //var id = new KSPUrlIdentifier(file.Url);
-
-
-        //    //if (id.Depth > 1) // find the correct subdir 
-        //    //{
-        //    //    var subdirUrl = new KSPUrlIdentifier(id.Parts.Take(id.Depth - 1).Aggregate((s1, s2) => s1 + "/" + s2));
-        //    //    var subdir = Directory(subdirUrl);
-
-        //    //    if (!subdir.Any())
-        //    //        throw new DirectoryNotFoundException(subdirUrl.Url);
-
-        //    //    subdir.Value.AddFile();
-        //    //}
-
-        //    //RootDirectory.AddFile(file);
-        //}
-
-
         public IEnumerable<IFile> Files(string extension)
         {
-            var sanitized = extension.TrimStart('.');
+            bool relative = extension.Contains("/") || extension.Contains("\\");
+
+            if (relative)
+            {
+                var url = new KSPUrlIdentifier(extension);
+
+                if (Url.Length <= 1) // eh??
+                    return Enumerable.Empty<IFile>();
+
+                // the last bit will be the filename, strip that out for the dir name
+                var dirUrl = url.Parts.Take(url.Parts.Length - 1).Aggregate((s1, s2) => s1 + "/" + s2);
+                var fileUrl = url.Parts.Last();
+
+                var dir = Directory(new KSPUrlIdentifier(dirUrl, UrlType.Directory));
+
+                return !dir.Any() ? Enumerable.Empty<IFile>() : dir.Value.Files(fileUrl);
+            }
 
             var files = Files();
 
-            var withExt = files.Where(f => f.Extension == sanitized);
+            var withExt = files.Where(f => MatchesExtension(extension, f));
 
             return withExt;
         }
 
+
+        // strip away leading *s or periods; convert null or empty to *
+        private static string GetSanitizedExtension(string extension)
+        {
+            return string.IsNullOrEmpty(extension) ? "*" : extension.TrimStart('*').TrimStart('.').With(s => string.IsNullOrEmpty(s) ? "*" : s).ToUpperInvariant();
+        }
+
+
+        private static bool MatchesExtension(string extension, [NotNull] IFile file)
+        {
+            if (string.IsNullOrEmpty(extension)) return true;
+            if (file == null) throw new ArgumentNullException("file");
+
+            var searchingForExtension = GetSanitizedExtension(extension);
+            if (searchingForExtension == "*") return true;
+
+            return GetSanitizedExtension(extension) == GetSanitizedExtension(file.Extension);
+        }
 
 
         public IEnumerable<IFile> RecursiveFiles()
@@ -153,9 +164,7 @@ namespace ReeperKSP.FileSystem
 
         public IEnumerable<IFile> RecursiveFiles(string extension)
         {
-            var sanitized = extension.TrimStart('.');
-
-            return RecursiveFiles().Where(f => f.Extension == sanitized);
+            return RecursiveFiles().Where(f => MatchesExtension(extension, f));
         }
 
 
@@ -163,8 +172,8 @@ namespace ReeperKSP.FileSystem
 
         public Maybe<IFile> File(IUrlIdentifier url)
         {
-            var filename = System.IO.Path.GetFileName(url.Path);
-            var dirPath = System.IO.Path.GetDirectoryName(url.Path);
+            var filename = Path.GetFileName(url.Path);
+            var dirPath = Path.GetDirectoryName(url.Path);
 
 
             if (!string.IsNullOrEmpty(dirPath))
@@ -178,10 +187,10 @@ namespace ReeperKSP.FileSystem
 
    
             var file = RootDirectory.Files
-                .FirstOrDefault(f => f.Name == System.IO.Path.GetFileNameWithoutExtension(filename) &&
-                                     (((System.IO.Path.HasExtension(filename) && System.IO.Path.GetExtension(filename) == ("." + f.Extension)))
+                .FirstOrDefault(f => f.Name == Path.GetFileNameWithoutExtension(filename) &&
+                                     (((Path.HasExtension(filename) && Path.GetExtension(filename) == ("." + f.Extension)))
                                       ||
-                                      (!System.IO.Path.HasExtension(filename))));
+                                      (!Path.HasExtension(filename))));
 
 
             return file.IsNull()

@@ -6,7 +6,6 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using JetBrains.Annotations;
-using KSPAssets.Loaders;
 using ReeperCommon.Containers;
 using ReeperCommon.Extensions;
 using ReeperCommon.Logging;

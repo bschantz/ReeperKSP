@@ -1,6 +1,7 @@
 ﻿using System;
 using ReeperCommon.DataObjects;
 using UnityEngine;
+using Object = UnityEngine.Object;
 
 namespace ReeperKSP.Gui.Controls
 {
@@ -30,7 +31,7 @@ namespace ReeperKSP.Gui.Controls
 
         private void UpdateSliderTexture()
         {
-            if (_sliderTexture != null) UnityEngine.Object.Destroy(_sliderTexture);
+            if (_sliderTexture != null) Object.Destroy(_sliderTexture);
             if (ScrollbarHeight < 1) return;
 
             var colors = new Color[ScrollbarHeight];

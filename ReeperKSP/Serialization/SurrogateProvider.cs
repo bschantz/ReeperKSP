@@ -4,7 +4,6 @@ using System.Linq;
 using System.Reflection;
 using ReeperCommon.Containers;
 
-
 namespace ReeperKSP.Serialization
 {
 // ReSharper disable once ClassWithVirtualMembersNeverInherited.Global
