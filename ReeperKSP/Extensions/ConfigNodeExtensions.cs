@@ -134,6 +134,7 @@ namespace ReeperKSP.Extensions
         }
 
 
+        // Makes ConfigNode.ToString() safe to use in formatted strings (otherwise the brackets will be interpreted as format tags)
         public static string ToSafeString(this ConfigNode config)
         {
             return config == null ? "<null ConfigNode>" : config.ToString().Replace("{", "{{").Replace("}", "}}"); // these are to escape the brackets which may otherwise be interpeted by String.Format as format tokens

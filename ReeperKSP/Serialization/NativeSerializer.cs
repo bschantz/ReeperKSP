@@ -22,7 +22,7 @@ namespace ReeperKSP.Serialization
 
             var reeperPersistent = target as IReeperPersistent;
             if (reeperPersistent == null)
-                throw new Exception("Failed to cast target " + type.FullName + " to " +
+                throw new Exception("Failed to cast target " + type.FullName + " to " + // todo: fix generic exception
                                     typeof(IReeperPersistent).FullName);
 
             // it's necessary to add a scope node here in case other same-level serialized objects are
@@ -56,7 +56,7 @@ namespace ReeperKSP.Serialization
 
             var reeperPersistent = (target ?? Activator.CreateInstance(type)) as IReeperPersistent;
             if (reeperPersistent == null) // uh ... how??
-                throw new Exception("Failed to create instance of type " + type.FullName + " for unknown reasons");
+                throw new Exception("Failed to create instance of type " + type.FullName + " for unknown reasons"); // todo: fix generic exception
 
 
             var configValue = config.GetNode(nativeNodeName);

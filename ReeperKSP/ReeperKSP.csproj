@@ -152,6 +152,9 @@
     <Compile Include="Serialization\Surrogates\WindowIDSurrogate.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="Utilities\" />
+  </ItemGroup>
+  <ItemGroup>
     <ProjectReference Include="..\..\ReeperCommon\ReeperCommon\ReeperCommon.csproj">
       <Project>{fecfa8fc-cf80-4685-a2ba-1566e0f3c26e}</Project>
       <Name>ReeperCommon</Name>

@@ -1,4 +1,5 @@
 ﻿using System;
+using ReeperCommon.Containers;
 
 namespace ReeperKSP.Serialization
 {
@@ -7,12 +8,10 @@ namespace ReeperKSP.Serialization
     /// </summary>
     public class PersistenceMethodCaller : IConfigNodeItemSerializer
     {
-        public readonly IConfigNodeItemSerializer DecoratedSerializer;
+        public readonly Maybe<IConfigNodeItemSerializer> DecoratedSerializer;
 
-        public PersistenceMethodCaller(IConfigNodeItemSerializer decoratedSerializer)
+        public PersistenceMethodCaller(Maybe<IConfigNodeItemSerializer> decoratedSerializer)
         {
-            if (decoratedSerializer == null) throw new ArgumentNullException("decoratedSerializer");
-
             DecoratedSerializer = decoratedSerializer;
         }
 
@@ -26,13 +25,15 @@ namespace ReeperKSP.Serialization
             if (persistObject != null && typeof(IPersistenceSave).IsAssignableFrom(type))
                 persistObject.PersistenceSave();
 
-            DecoratedSerializer.Serialize(type, ref target, key, config, serializer);
+            if (DecoratedSerializer.HasValue)
+                DecoratedSerializer.Value.Serialize(type, ref target, key, config, serializer);
         }
 
 
         public void Deserialize(Type type, ref object target, string key, ConfigNode config, IConfigNodeSerializer serializer)
         {
-            DecoratedSerializer.Deserialize(type, ref target, key, config, serializer);
+            if (DecoratedSerializer.HasValue)
+                DecoratedSerializer.Value.Deserialize(type, ref target, key, config, serializer);
 
             var persistObject = target as IPersistenceLoad;
 

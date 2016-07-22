@@ -37,7 +37,6 @@ namespace ReeperKSP.AssetBundleLoading
         }
 
 
-        
         /// <summary>
         /// Synchronously inject assets into target fields
         /// </summary>
