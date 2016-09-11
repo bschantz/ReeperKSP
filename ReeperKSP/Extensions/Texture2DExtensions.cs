@@ -8,11 +8,13 @@ namespace ReeperKSP.Extensions
 {
     public static class Texture2DExtensions
     {
+
+
         /// <summary>
         /// Saves texture into plugin dir with supplied name.
         /// Precondition: texture must be readable
         /// </summary>
-        public static bool SaveToDisk(this Texture2D texture, string pathInGameData)
+        public static bool SaveToDisk(this Texture2D texture, string pathInGameData, TextureFormat format = TextureFormat.ARGB32)
         {
             // texture format - needs to be ARGB32, RGBA32, RGB24 or Alpha8
             var validFormats = new List<TextureFormat>{ TextureFormat.Alpha8, 
@@ -20,8 +22,11 @@ namespace ReeperKSP.Extensions
                                                         TextureFormat.RGBA32,
                                                         TextureFormat.ARGB32};
 
+            if (!validFormats.Contains(format))
+                throw new ArgumentException(format + " is not supported", "format");
+
             if (!validFormats.Contains(texture.format))
-                return ReeperCommonTexture2DExtensions.CreateReadable(texture).SaveToDisk(pathInGameData);
+                return ReeperCommonTexture2DExtensions.CreateReadable(texture, format).SaveToDisk(pathInGameData);
 
 
             if (pathInGameData.StartsWith("/"))

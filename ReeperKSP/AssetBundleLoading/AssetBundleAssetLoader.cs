@@ -133,6 +133,22 @@ namespace ReeperKSP.AssetBundleLoading
         }
 
 
+        public static Coroutine<ValuelessCoroutine> LoadAssetBundleAsync([NotNull] IFile file)
+        {
+            if (file == null) throw new ArgumentNullException("file");
+
+            return CoroutineHoster.Instance.StartCoroutine<ValuelessCoroutine>(LoadAssetBundleAsync(file.FullPath));
+        }
+
+
+        public static AssetBundleHandle LoadAssetBundle([NotNull] IFile file)
+        {
+            if (file == null) throw new ArgumentNullException("file");
+
+            return new AssetBundleHandle(LoadAssetBundle(file.FullPath));
+        }
+
+
         private static List<string> GetPathsOfNecessaryBundles([NotNull] Type targetType, [NotNull] IEnumerable<FieldInfo> fieldsToInject)
         {
             if (targetType == null) throw new ArgumentNullException("targetType");

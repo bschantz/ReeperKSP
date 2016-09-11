@@ -156,8 +156,11 @@ namespace ReeperKSP.FileSystem
         public IEnumerable<IFile> RecursiveFiles()
         {
             return
-                RootDirectory.AllFiles
-               .Select(url => FileSystemFactory.GetFile(FileSystemFactory.GetDirectory(url.Directory), url));
+                RootDirectory.Files
+                .Select(url => FileSystemFactory.GetFile(FileSystemFactory.GetDirectory(url.Directory), url))
+                .Union(
+                    RootDirectory.Children.SelectMany(
+                        chDir => new KSPDirectory(FileSystemFactory, chDir).RecursiveFiles()));
         }
 
 

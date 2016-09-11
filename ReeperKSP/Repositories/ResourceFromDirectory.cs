@@ -39,9 +39,20 @@ namespace ReeperKSP.Repositories
             if (Application.platform == RuntimePlatform.WindowsPlayer)
             {
                 if (!path.StartsWith("file:///"))
+                {
+                    if (path.StartsWith("file://"))
+                        path = path.Substring(0, "file://".Length);
+
                     path = "file:///" + path;
+                }
             }
-            else if (!path.StartsWith("file://")) path = "file://" + path;
+            else
+            {
+                if (path.StartsWith("file:///"))
+                    path = path.Substring(0, "file://".Length);
+
+                if (!path.StartsWith("file://")) path = "file://" + path;
+            }
 
             // WWW.EscapeURL doesn't seem to work all that great.  I couldn't get
             // AudioClips to come out of it correctly.  Non-escaped local urls
