@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using ReeperCommon.Containers;
 
 namespace ReeperKSP.FileSystem
@@ -18,13 +19,13 @@ namespace ReeperKSP.FileSystem
 
         Maybe<IFile> File(IUrlIdentifier url);
         Maybe<IFile> File(string filename);
-        IEnumerable<IFile> Files();
-        IEnumerable<IFile> Files(string extension);
-        IEnumerable<IFile> RecursiveFiles();
-        IEnumerable<IFile> RecursiveFiles(string extension);
+        ReadOnlyCollection<IFile> Files();
+        ReadOnlyCollection<IFile> Files(string extension);
+        ReadOnlyCollection<IFile> RecursiveFiles();
+        ReadOnlyCollection<IFile> RecursiveFiles(string extension);
 
-        IEnumerable<IDirectory> Directories();
-        IEnumerable<IDirectory> RecursiveDirectories();
+        ReadOnlyCollection<IDirectory> Directories();
+        ReadOnlyCollection<IDirectory> RecursiveDirectories();
 
         Maybe<IDirectory> Parent { get; }
         string FullPath { get; }

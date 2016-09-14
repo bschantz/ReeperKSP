@@ -457,7 +457,7 @@ namespace ReeperKSP.AssetBundleLoading
             if (PendingBundles.Contains(assetBundlePath)) // todo: cancel pending asset bundle, if necessary? just throw for now
                 throw new ArgumentException("Bundle '" + assetBundlePath + "' is already being loaded asynchronously", "assetBundlePath");
             
-            var bundle = AssetBundle.CreateFromMemoryImmediate(File.ReadAllBytes(assetBundlePath));
+            var bundle = AssetBundle.LoadFromMemory(File.ReadAllBytes(assetBundlePath));
 
             if (bundle == null)
                 throw new ArgumentException("Failed to create AssetBundle from '" + assetBundlePath + "'");

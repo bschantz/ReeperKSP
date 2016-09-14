@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using JetBrains.Annotations;
@@ -29,8 +30,6 @@ namespace ReeperKSP.FileSystem
         }
 
 
-
-
         public Maybe<IDirectory> Directory(IUrlIdentifier url)
         {
             if (url.Depth < 1)
@@ -50,21 +49,22 @@ namespace ReeperKSP.FileSystem
 
 
 
-        public IEnumerable<IDirectory> Directories()
+        public ReadOnlyCollection<IDirectory> Directories()
         {
             return RootDirectory.Children
-                .Select(url => FileSystemFactory.GetDirectory(url));
+                .Select(url => FileSystemFactory.GetDirectory(url))
+                .ToList().AsReadOnly();
         }
 
 
 
-        public IEnumerable<IDirectory> RecursiveDirectories()
+        public ReadOnlyCollection<IDirectory> RecursiveDirectories()
         {
             return RootDirectory.Children
                 .Select(child => FileSystemFactory.GetDirectory(child))
                 .Union(
                     RootDirectory.Children
-                        .SelectMany(child => FileSystemFactory.GetDirectory(child).RecursiveDirectories()));
+                        .SelectMany(child => FileSystemFactory.GetDirectory(child).RecursiveDirectories())).ToList().AsReadOnly();
         }
 
 
@@ -98,15 +98,16 @@ namespace ReeperKSP.FileSystem
 
 
 
-        public IEnumerable<IFile> Files()
+        public ReadOnlyCollection<IFile> Files()
         {
             return
                 RootDirectory.Files
-                .Select(url => FileSystemFactory.GetFile(this, url));
+                .Select(url => FileSystemFactory.GetFile(this, url))
+                .ToList().AsReadOnly();
         }
 
 
-        public IEnumerable<IFile> Files(string extension)
+        public ReadOnlyCollection<IFile> Files(string extension)
         {
             bool relative = extension.Contains("/") || extension.Contains("\\");
 
@@ -115,7 +116,7 @@ namespace ReeperKSP.FileSystem
                 var url = new KSPUrlIdentifier(extension);
 
                 if (Url.Length <= 1) // eh??
-                    return Enumerable.Empty<IFile>();
+                    return new ReadOnlyCollection<IFile>(new IFile[0]);
 
                 // the last bit will be the filename, strip that out for the dir name
                 var dirUrl = url.Parts.Take(url.Parts.Length - 1).Aggregate((s1, s2) => s1 + "/" + s2);
@@ -123,14 +124,14 @@ namespace ReeperKSP.FileSystem
 
                 var dir = Directory(new KSPUrlIdentifier(dirUrl, UrlType.Directory));
 
-                return !dir.Any() ? Enumerable.Empty<IFile>() : dir.Value.Files(fileUrl);
+                return !dir.Any() ? new ReadOnlyCollection<IFile>(new IFile[0]) : dir.Value.Files(fileUrl);
             }
 
             var files = Files();
 
             var withExt = files.Where(f => MatchesExtension(extension, f));
 
-            return withExt;
+            return withExt.ToList().AsReadOnly();
         }
 
 
@@ -153,24 +154,19 @@ namespace ReeperKSP.FileSystem
         }
 
 
-        public IEnumerable<IFile> RecursiveFiles()
+        public ReadOnlyCollection<IFile> RecursiveFiles()
         {
-            return
-                RootDirectory.Files
+            return RootDirectory.Files
                 .Select(url => FileSystemFactory.GetFile(FileSystemFactory.GetDirectory(url.Directory), url))
-                .Union(
-                    RootDirectory.Children.SelectMany(
-                        chDir => new KSPDirectory(FileSystemFactory, chDir).RecursiveFiles()));
+                .Union(Directories().SelectMany(d => d.RecursiveFiles())).ToList().AsReadOnly();
         }
 
 
 
-        public IEnumerable<IFile> RecursiveFiles(string extension)
+        public ReadOnlyCollection<IFile> RecursiveFiles(string extension)
         {
-            return RecursiveFiles().Where(f => MatchesExtension(extension, f));
+            return RecursiveFiles().Where(f => MatchesExtension(extension, f)).ToList().AsReadOnly();
         }
-
-
 
 
         public Maybe<IFile> File(IUrlIdentifier url)
